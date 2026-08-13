@@ -11,9 +11,41 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\Catalog\ClothingTypeController;
+use App\Http\Controllers\Api\V1\Catalog\ColorController;
+use App\Http\Controllers\Api\V1\Catalog\DesignController;
+use App\Http\Controllers\Api\V1\Catalog\FabricController;
+use App\Http\Controllers\Api\V1\Catalog\ProductController;
+use App\Http\Controllers\Api\V1\Catalog\ProductionTierController;
+use App\Http\Controllers\Api\V1\Catalog\SizeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
+    // Public catalog endpoints
+    Route::prefix('catalog')->name('catalog.')->group(function () {
+        Route::get('clothing-types', [ClothingTypeController::class, 'index'])
+            ->name('clothing-types.index');
+        Route::get('fabrics', [FabricController::class, 'index'])
+            ->name('fabrics.index');
+        Route::get('colors', [ColorController::class, 'index'])
+            ->name('colors.index');
+        Route::get('sizes', [SizeController::class, 'index'])
+            ->name('sizes.index');
+        Route::get('production-tiers', [ProductionTierController::class, 'index'])
+            ->name('production-tiers.index');
+
+        // Designs
+        Route::get('designs', [DesignController::class, 'index'])
+            ->name('designs.index');
+        Route::get('designs/{design:slug}', [DesignController::class, 'show'])
+            ->name('designs.show');
+
+        // Products
+        Route::get('products', [ProductController::class, 'index'])
+            ->name('products.index');
+        Route::get('products/{product:slug}', [ProductController::class, 'show'])
+            ->name('products.show');
+    });
 
     // Admin endpoints
     Route::prefix('auth/admin')->name('admin.')->group(function () {

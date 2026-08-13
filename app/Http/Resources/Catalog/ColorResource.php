@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Http\Resources\Catalog;
+
+use App\Models\Color;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/** @mixin Color */
+class ColorResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'hex_code' => $this->hex_code,
+            'swatch_image_path' => $this->swatch_image_path,
+        ];
+    }
+}
