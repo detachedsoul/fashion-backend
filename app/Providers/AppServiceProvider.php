@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Response;
@@ -88,10 +90,30 @@ class AppServiceProvider extends ServiceProvider
     protected function registerResponseMacros(): void
     {
         Response::macro('success', function (mixed $data = null, string $message = 'Success', int $status = 200) {
+            $payload = $data;
+
+            if ($data instanceof ResourceCollection
+                && $data->resource instanceof LengthAwarePaginator) {
+                $paginator = $data->resource;
+
+                $payload = [
+                    'items' => $data,
+                    'pagination' => [
+                        'current_page' => $paginator->currentPage(),
+                        'last_page' => $paginator->lastPage(),
+                        'per_page' => $paginator->perPage(),
+                        'total' => $paginator->total(),
+                        'has_more_pages' => $paginator->hasMorePages(),
+                        'next_page' => $paginator->hasMorePages() ? $paginator->currentPage() + 1 : null,
+                        'prev_page' => $paginator->currentPage() > 1 ? $paginator->currentPage() - 1 : null,
+                    ],
+                ];
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'data' => $data,
+                'data' => $payload,
                 'errors' => null,
             ], $status);
         });

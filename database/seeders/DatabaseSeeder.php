@@ -20,6 +20,10 @@ class DatabaseSeeder extends Seeder
             RoleAndPermissionSeeder::class,
             AdminSeeder::class,
             AffiliateTierSeeder::class,
+            ProductionTierSeeder::class,
+            CatalogSeeder::class,
+            DesignSeeder::class,
+            ProductSeeder::class,
         ]);
     }
 }
