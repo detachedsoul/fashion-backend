@@ -15,4 +15,11 @@ class ProductionTier extends Model
     {
         return ['is_active' => 'boolean'];
     }
+
+    // No orders() relation yet - the Order model doesn't exist until the
+    // Orders module lands. See ProductionTierController::destroy() for how
+    // the dependent-check is done in the meantime (raw table query, not a
+    // relation). Once Order exists, this should get a real
+    // `public function orders(): HasMany` and the controller should switch
+    // to using it.
 }
