@@ -5,6 +5,11 @@ use App\Http\Controllers\Api\V1\Admin\AdminLoginController;
 use App\Http\Controllers\Api\V1\Admin\AdminLogoutController;
 use App\Http\Controllers\Api\V1\Admin\AdminPasswordResetController;
 use App\Http\Controllers\Api\V1\Admin\AdminProfileController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\ClothingTypeController as AdminClothingTypeController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\ColorController as AdminColorController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\FabricController as AdminFabricController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\ProductionTierController as AdminProductionTierController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\SizeController as AdminSizeController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
@@ -47,7 +52,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             ->name('products.show');
     });
 
-    // Admin endpoints
+    // Admin auth endpoints
     Route::prefix('auth/admin')->name('admin.')->group(function () {
 
         Route::middleware('throttle:admin-auth')->group(function () {
@@ -92,6 +97,18 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
                 ->name('me.pending-email.cancel');
         });
     });
+
+    // Admin endpoints
+    Route::prefix('admin/catalog')
+        ->name('admin.catalog.')
+        ->middleware(['auth:admin', 'permission:products.manage'])
+        ->group(function () {
+            Route::apiResource('clothing-types', AdminClothingTypeController::class)->except('show');
+            Route::apiResource('fabrics', AdminFabricController::class)->except('show');
+            Route::apiResource('colors', AdminColorController::class)->except('show');
+            Route::apiResource('sizes', AdminSizeController::class)->except('show');
+            Route::apiResource('production-tiers', AdminProductionTierController::class)->except('show');
+        });
 
     // User auth endpoints
     Route::prefix('auth')->name('auth.')->group(function () {

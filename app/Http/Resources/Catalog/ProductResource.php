@@ -9,8 +9,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * @mixin Product
  *
- * Expects 'clothingType' and 'variants.fabric'/'variants.color'/'variants.size'
- * to be eager loaded by the caller - see whenLoaded() note in DesignResource.
+ * Expects 'clothingType', 'variants.fabric'/'variants.color'/'variants.size',
+ * and now 'images' to be eager loaded by the caller - see whenLoaded()
+ * note in DesignResource.
  */
 class ProductResource extends JsonResource
 {
@@ -26,6 +27,7 @@ class ProductResource extends JsonResource
             'stock_quantity' => $this->stock_quantity,
             'clothing_type' => new ClothingTypeResource($this->whenLoaded('clothingType')),
             'variants' => ProductVariantResource::collection($this->whenLoaded('variants')),
+            'images' => ProductImageResource::collection($this->whenLoaded('images')),
         ];
     }
 }
