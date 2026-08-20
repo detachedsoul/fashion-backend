@@ -103,6 +103,9 @@ class AppServiceProvider extends ServiceProvider
                         'last_page' => $paginator->lastPage(),
                         'per_page' => $paginator->perPage(),
                         'total' => $paginator->total(),
+                        'has_more_pages' => $paginator->hasMorePages(),
+                        'next_page' => $paginator->hasMorePages() ? $paginator->currentPage() + 1 : null,
+                        'prev_page' => $paginator->currentPage() > 1 ? $paginator->currentPage() - 1 : null,
                     ],
                 ];
             }
