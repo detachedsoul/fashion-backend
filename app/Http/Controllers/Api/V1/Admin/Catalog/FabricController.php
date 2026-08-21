@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin\Catalog;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Catalog\IndexFabricsRequest;
 use App\Http\Requests\Admin\Catalog\StoreFabricRequest;
 use App\Http\Requests\Admin\Catalog\UpdateFabricRequest;
 use App\Http\Resources\Catalog\FabricResource;
@@ -15,9 +16,19 @@ class FabricController extends Controller
 {
     public function __construct(protected CatalogImageService $images) {}
 
-    public function index(): JsonResponse
+    public function index(IndexFabricsRequest $request): JsonResponse
     {
-        $fabrics = Fabric::query()->orderBy('name')->get();
+        $fabrics = Fabric::query()
+            ->when(
+                $request->filled('is_active'),
+                fn ($query) => $query->where('is_active', $request->boolean('is_active')),
+            )
+            ->when(
+                $request->filled('stock_status'),
+                fn ($query) => $query->where('stock_status', $request->string('stock_status')),
+            )
+            ->orderBy('name')
+            ->get();
 
         return response()->success(data: FabricResource::collection($fabrics));
     }
@@ -64,8 +75,6 @@ class FabricController extends Controller
 
     public function destroy(Fabric $fabric): JsonResponse
     {
-        // product_variants/custom_order_details null out fabric_id on
-        // delete rather than restricting - safe to delete freely.
         $this->images->delete($fabric->swatch_image_path);
         $fabric->delete();
 

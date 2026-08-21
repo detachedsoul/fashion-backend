@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin\Catalog;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Catalog\IndexColorsRequest;
 use App\Http\Requests\Admin\Catalog\StoreColorRequest;
 use App\Http\Requests\Admin\Catalog\UpdateColorRequest;
 use App\Http\Resources\Catalog\ColorResource;
@@ -14,9 +15,15 @@ class ColorController extends Controller
 {
     public function __construct(protected CatalogImageService $images) {}
 
-    public function index(): JsonResponse
+    public function index(IndexColorsRequest $request): JsonResponse
     {
-        $colors = Color::query()->orderBy('name')->get();
+        $colors = Color::query()
+            ->when(
+                $request->filled('is_active'),
+                fn ($query) => $query->where('is_active', $request->boolean('is_active')),
+            )
+            ->orderBy('name')
+            ->get();
 
         return response()->success(data: ColorResource::collection($colors));
     }
@@ -56,7 +63,6 @@ class ColorController extends Controller
 
     public function destroy(Color $color): JsonResponse
     {
-        // Safe to delete freely - dependents null out color_id, don't restrict.
         $this->images->delete($color->swatch_image_path);
         $color->delete();
 

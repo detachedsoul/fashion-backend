@@ -45,7 +45,7 @@ class ProductController extends Controller
                 fn ($query) => $query->whereHas('variants', fn ($v) => $v->where('size_id', $request->string('size_id'))),
             )
             ->tap(fn ($query) => $this->applySort($query, $request->string('sort')->value()))
-            ->paginate($request->integer('per_page', 24));
+            ->paginate($request->integer('per_page', 10));
 
         return response()->success(data: ProductResource::collection($products));
     }
