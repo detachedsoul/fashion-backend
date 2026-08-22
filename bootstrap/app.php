@@ -92,7 +92,7 @@ return Application::configure(basePath: dirname(__DIR__))
                         : 'Request failed.',
                     errors: $isLocal ? [
                         'message' => $error->getMessage(),
-                        'trace' => $error->getTrace(),
+                        'trace' => $error->getTraceAsString(),
                     ] : null,
                     status: $error->getStatusCode(),
                 );
@@ -105,7 +105,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     message: 'Something went wrong. Please try again.',
                     errors: App::isLocal() ? [
                         'message' => $error->getMessage(),
-                        'trace' => $error->getTrace(),
+                        'trace' => $error->getTraceAsString(),
                     ] : null,
                     status: 500
                 );

@@ -7,7 +7,14 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'slug', 'description', 'image_path', 'is_custom_only', 'is_active'])]
+#[Fillable([
+    'name',
+    'slug',
+    'description',
+    'image_path',
+    'is_custom_only',
+    'is_active',
+])]
 class ClothingType extends Model
 {
     use HasUlids;

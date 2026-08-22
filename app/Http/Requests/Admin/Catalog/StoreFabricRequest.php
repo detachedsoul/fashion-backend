@@ -15,10 +15,10 @@ class StoreFabricRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
+            'description' => ['required', 'string'],
             'price_modifier_kobo' => ['sometimes', 'integer', 'min:0'],
             'stock_status' => ['sometimes', 'in:in_stock,low_stock,out_of_stock'],
-            'image' => ['nullable', 'image', 'max:4096'],
+            'image' => ['required', 'image', 'max:4096'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

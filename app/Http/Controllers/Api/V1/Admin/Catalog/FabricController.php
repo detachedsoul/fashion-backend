@@ -48,7 +48,11 @@ class FabricController extends Controller
             ])->save();
         }
 
-        return response()->success(data: new FabricResource($fabric), message: 'Fabric created.', status: 201);
+        return response()->success(
+            data: new FabricResource($fabric),
+            message: 'Fabric created.',
+            status: 201
+        );
     }
 
     public function update(UpdateFabricRequest $request, Fabric $fabric): JsonResponse
