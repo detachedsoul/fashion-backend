@@ -16,7 +16,11 @@ class FabricController extends Controller
             ->where('is_active', true)
             ->when(
                 $request->filled('stock_status'),
-                fn ($query) => $query->where('stock_status', $request->string('stock_status')),
+                fn ($query) => $query->where('stock_status', $request->string('stock_status')->value()),
+            )
+            ->when(
+                $request->filled('search'),
+                fn ($query) => $query->where('name', 'like', '%'.$request->string('search')->value().'%'),
             )
             ->orderBy('name')
             ->get();

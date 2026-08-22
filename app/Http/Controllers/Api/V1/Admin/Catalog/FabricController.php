@@ -25,7 +25,11 @@ class FabricController extends Controller
             )
             ->when(
                 $request->filled('stock_status'),
-                fn ($query) => $query->where('stock_status', $request->string('stock_status')),
+                fn ($query) => $query->where('stock_status', $request->string('stock_status')->value()),
+            )
+            ->when(
+                $request->filled('search'),
+                fn ($query) => $query->where('name', 'like', '%'.$request->string('search')->value().'%'),
             )
             ->orderBy('name')
             ->get();
@@ -59,8 +63,8 @@ class FabricController extends Controller
     {
         $fabric->fill($request->safe()->except(['image', 'name']));
 
-        if ($request->filled('name') && $request->string('name') !== $fabric->name) {
-            $fabric->name = $request->string('name');
+        if ($request->filled('name') && $request->string('name')->value() !== $fabric->name) {
+            $fabric->name = $request->string('name')->value();
             $fabric->slug = $this->uniqueSlug($request->string('name')->value(), $fabric->id);
         }
 

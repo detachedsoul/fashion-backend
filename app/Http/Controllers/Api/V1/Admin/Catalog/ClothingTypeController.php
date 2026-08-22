@@ -30,6 +30,10 @@ class ClothingTypeController extends Controller
                 $request->filled('is_custom_only'),
                 fn ($query) => $query->where('is_custom_only', $request->boolean('is_custom_only')),
             )
+            ->when(
+                $request->filled('search'),
+                fn ($query) => $query->where('name', 'like', '%'.$request->string('search')->value().'%'),
+            )
             ->orderBy('name')
             ->get();
 
@@ -58,8 +62,8 @@ class ClothingTypeController extends Controller
     {
         $clothingType->fill($request->safe()->except(['image', 'name']));
 
-        if ($request->filled('name') && $request->string('name') !== $clothingType->name) {
-            $clothingType->name = $request->string('name');
+        if ($request->filled('name') && $request->string('name')->value() !== $clothingType->name) {
+            $clothingType->name = $request->string('name')->value();
             $clothingType->slug = $this->uniqueSlug($request->string('name')->value(), $clothingType->id);
         }
 

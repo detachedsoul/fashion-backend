@@ -36,9 +36,9 @@ class AdminLoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $admin = Admin::where('email', $this->string('email'))->first();
+        $admin = Admin::where('email', $this->string('email')->value())->first();
 
-        if (! $admin || ! Hash::check($this->string('password'), $admin->password)) {
+        if (! $admin || ! Hash::check($this->string('password')->value(), $admin->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -71,6 +71,6 @@ class AdminLoginRequest extends FormRequest
 
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')->value()).'|'.$this->ip());
     }
 }

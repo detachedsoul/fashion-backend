@@ -18,7 +18,7 @@ class DesignController extends Controller
             ->where('is_active', true)
             ->when(
                 $request->filled('clothing_type_id'),
-                fn ($query) => $query->where('clothing_type_id', $request->string('clothing_type_id')),
+                fn ($query) => $query->where('clothing_type_id', $request->string('clothing_type_id')->value()),
             )
             ->when(
                 $request->filled('featured'),
@@ -26,7 +26,7 @@ class DesignController extends Controller
             )
             ->when(
                 $request->filled('search'),
-                fn ($query) => $query->where('name', 'like', '%'.$request->string('search').'%'),
+                fn ($query) => $query->where('name', 'like', '%'.$request->string('search')->value().'%'),
             )
             ->when(
                 $request->filled('min_price_kobo'),

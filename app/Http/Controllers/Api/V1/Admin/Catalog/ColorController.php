@@ -22,6 +22,10 @@ class ColorController extends Controller
                 $request->filled('is_active'),
                 fn ($query) => $query->where('is_active', $request->boolean('is_active')),
             )
+            ->when(
+                $request->filled('search'),
+                fn ($query) => $query->where('name', 'like', '%'.$request->string('search')->value().'%'),
+            )
             ->orderBy('name')
             ->get();
 

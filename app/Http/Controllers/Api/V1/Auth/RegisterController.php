@@ -19,10 +19,10 @@ class RegisterController extends Controller
 
         $user = DB::transaction(function () use ($request, $referrer): User {
             return User::create([
-                'name' => $request->string('name'),
-                'email' => $request->string('email'),
+                'name' => $request->string('name')->value(),
+                'email' => $request->string('email')->value(),
                 'phone' => $request->string('phone')->value(),
-                'password' => Hash::make($request->string('password')),
+                'password' => Hash::make($request->string('password')->value()),
                 'referred_by_user_id' => $referrer?->id,
             ]);
         });
