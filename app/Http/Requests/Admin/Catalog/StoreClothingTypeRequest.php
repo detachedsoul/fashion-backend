@@ -15,8 +15,8 @@ class StoreClothingTypeRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'image' => ['nullable', 'image', 'max:4096'],
+            'description' => ['required', 'string'],
+            'image' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:4096', 'dimensions:min_width=100,min_height=100'],
             'is_custom_only' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
         ];
