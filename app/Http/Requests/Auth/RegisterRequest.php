@@ -30,7 +30,7 @@ class RegisterRequest extends FormRequest
     public function referrer(): ?User
     {
         return $this->filled('referral_code')
-            ? User::where('referral_code', $this->string('referral_code'))->first()
+            ? User::where('referral_code', $this->string('referral_code')->value())->first()
             : null;
     }
 }

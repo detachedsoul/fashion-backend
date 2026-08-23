@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin\Catalog;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Catalog\IndexProductionTiersRequest;
 use App\Http\Requests\Admin\Catalog\StoreProductionTierRequest;
 use App\Http\Requests\Admin\Catalog\UpdateProductionTierRequest;
 use App\Http\Resources\Catalog\ProductionTierResource;
@@ -12,9 +13,15 @@ use Illuminate\Support\Facades\DB;
 
 class ProductionTierController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(IndexProductionTiersRequest $request): JsonResponse
     {
-        $tiers = ProductionTier::query()->orderByDesc('production_days_min')->get();
+        $tiers = ProductionTier::query()
+            ->when(
+                $request->filled('is_active'),
+                fn ($query) => $query->where('is_active', $request->boolean('is_active')),
+            )
+            ->orderByDesc('production_days_min')
+            ->get();
 
         return response()->success(data: ProductionTierResource::collection($tiers));
     }
@@ -38,12 +45,6 @@ class ProductionTierController extends Controller
 
     public function destroy(ProductionTier $productionTier): JsonResponse
     {
-        // orders.production_tier_id RESTRICT-deletes. Queried against the
-        // table directly (not an Eloquent relation) since the Order model
-        // doesn't exist until the Orders module lands - the `orders` table
-        // itself already does, from the schema-foundation migration.
-        // TODO: once App\Models\Order exists, add a real orders() relation
-        // to ProductionTier and switch this to $productionTier->orders()->exists().
         $hasOrders = DB::table('orders')->where('production_tier_id', $productionTier->id)->exists();
 
         if ($hasOrders) {

@@ -60,7 +60,7 @@ class ProfileController extends Controller
     public function changePassword(ChangePasswordRequest $request): JsonResponse
     {
         $user = $request->user();
-        $user->forceFill(['password' => Hash::make($request->string('password'))])->save();
+        $user->forceFill(['password' => Hash::make($request->string('password')->value())])->save();
 
         $user->tokens()->where('id', '!=', $user->currentAccessToken()->id)->delete();
 

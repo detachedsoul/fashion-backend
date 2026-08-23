@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin\Catalog;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreClothingTypeRequest extends FormRequest
+class IndexClothingTypesRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,11 +14,8 @@ class StoreClothingTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'image' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:4096', 'dimensions:min_width=100,min_height=100'],
-            'is_custom_only' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
+            'is_custom_only' => ['sometimes', 'boolean'],
         ];
     }
 }

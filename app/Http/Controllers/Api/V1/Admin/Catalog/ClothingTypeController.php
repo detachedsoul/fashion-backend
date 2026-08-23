@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin\Catalog;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Catalog\IndexClothingTypesRequest;
 use App\Http\Requests\Admin\Catalog\StoreClothingTypeRequest;
 use App\Http\Requests\Admin\Catalog\UpdateClothingTypeRequest;
 use App\Http\Resources\Catalog\ClothingTypeResource;
@@ -15,11 +16,26 @@ class ClothingTypeController extends Controller
 {
     public function __construct(protected CatalogImageService $images) {}
 
-    public function index(): JsonResponse
+    public function index(IndexClothingTypesRequest $request): JsonResponse
     {
-        // Unlike the public browse endpoint, admins see everything,
-        // including inactive ones.
-        $clothingTypes = ClothingType::query()->orderBy('name')->get();
+        // Unlike the public browse endpoint, admins can see everything,
+        // including inactive ones - hence is_active being an optional
+        // filter here rather than an always-applied where().
+        $clothingTypes = ClothingType::query()
+            ->when(
+                $request->filled('is_active'),
+                fn ($query) => $query->where('is_active', $request->boolean('is_active')),
+            )
+            ->when(
+                $request->filled('is_custom_only'),
+                fn ($query) => $query->where('is_custom_only', $request->boolean('is_custom_only')),
+            )
+            ->when(
+                $request->filled('search'),
+                fn ($query) => $query->where('name', 'like', '%'.$request->string('search')->value().'%'),
+            )
+            ->orderBy('name')
+            ->get();
 
         return response()->success(data: ClothingTypeResource::collection($clothingTypes));
     }
@@ -46,8 +62,8 @@ class ClothingTypeController extends Controller
     {
         $clothingType->fill($request->safe()->except(['image', 'name']));
 
-        if ($request->filled('name') && $request->string('name') !== $clothingType->name) {
-            $clothingType->name = $request->string('name');
+        if ($request->filled('name') && $request->string('name')->value() !== $clothingType->name) {
+            $clothingType->name = $request->string('name')->value();
             $clothingType->slug = $this->uniqueSlug($request->string('name')->value(), $clothingType->id);
         }
 
@@ -66,9 +82,6 @@ class ClothingTypeController extends Controller
 
     public function destroy(ClothingType $clothingType): JsonResponse
     {
-        // designs/products RESTRICT-delete on clothing_type_id - check first
-        // and return a clean 409 rather than letting a raw DB constraint
-        // error surface to the client.
         if ($clothingType->designs()->exists() || $clothingType->products()->exists()) {
             return response()->error(
                 'Cannot delete: still in use by existing designs or products. Deactivate it instead.',

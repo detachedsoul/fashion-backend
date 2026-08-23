@@ -18,11 +18,11 @@ class ProductController extends Controller
             ->with(['clothingType', 'variants.fabric', 'variants.color', 'variants.size', 'images'])
             ->when(
                 $request->filled('clothing_type_id'),
-                fn ($query) => $query->where('clothing_type_id', $request->string('clothing_type_id')),
+                fn ($query) => $query->where('clothing_type_id', $request->string('clothing_type_id')->value()),
             )
             ->when(
                 $request->filled('search'),
-                fn ($query) => $query->where('name', 'like', '%'.$request->string('search').'%'),
+                fn ($query) => $query->where('name', 'like', '%'.$request->string('search')->value().'%'),
             )
             ->when(
                 $request->filled('min_price_kobo'),
@@ -34,18 +34,18 @@ class ProductController extends Controller
             )
             ->when(
                 $request->filled('color_id'),
-                fn ($query) => $query->whereHas('variants', fn ($v) => $v->where('color_id', $request->string('color_id'))),
+                fn ($query) => $query->whereHas('variants', fn ($colorId) => $colorId->where('color_id', $request->string('color_id')->value())),
             )
             ->when(
                 $request->filled('fabric_id'),
-                fn ($query) => $query->whereHas('variants', fn ($v) => $v->where('fabric_id', $request->string('fabric_id'))),
+                fn ($query) => $query->whereHas('variants', fn ($fabricId) => $fabricId->where('fabric_id', $request->string('fabric_id')->value())),
             )
             ->when(
                 $request->filled('size_id'),
-                fn ($query) => $query->whereHas('variants', fn ($v) => $v->where('size_id', $request->string('size_id'))),
+                fn ($query) => $query->whereHas('variants', fn ($sizeId) => $sizeId->where('size_id', $request->string('size_id')->value())),
             )
             ->tap(fn ($query) => $this->applySort($query, $request->string('sort')->value()))
-            ->paginate($request->integer('per_page', 24));
+            ->paginate($request->integer('per_page', 10));
 
         return response()->success(data: ProductResource::collection($products));
     }

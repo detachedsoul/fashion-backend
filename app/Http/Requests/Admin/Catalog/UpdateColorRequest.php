@@ -16,7 +16,7 @@ class UpdateColorRequest extends FormRequest
         return [
             'name' => ['sometimes', 'string', 'max:255'],
             'hex_code' => ['sometimes', 'regex:/^#[0-9A-Fa-f]{6}$/'],
-            'image' => ['sometimes', 'nullable', 'image', 'max:4096'],
+            'image' => ['sometimes', 'nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:4096', 'dimensions:min_width=100,min_height=100'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

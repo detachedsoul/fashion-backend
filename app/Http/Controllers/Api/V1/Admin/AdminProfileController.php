@@ -60,7 +60,7 @@ class AdminProfileController extends Controller
     public function changePassword(AdminChangePasswordRequest $request): JsonResponse
     {
         $admin = $request->user();
-        $admin->forceFill(['password' => Hash::make($request->string('password'))])->save();
+        $admin->forceFill(['password' => Hash::make($request->string('password')->value())])->save();
 
         $admin->tokens()->where('id', '!=', $admin->currentAccessToken()->id)->delete();
 
