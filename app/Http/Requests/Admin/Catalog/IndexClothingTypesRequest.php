@@ -11,6 +11,21 @@ class IndexClothingTypesRequest extends FormRequest
         return true; // gated by auth:admin + permission:products.manage at the route level
     }
 
+    protected function prepareForValidation(): void
+    {
+        $data = [];
+
+        if ($this->has('is_active')) {
+            $data['is_active'] = $this->boolean('is_active');
+        }
+
+        if ($this->has('is_custom_only')) {
+            $data['is_custom_only'] = $this->boolean('is_custom_only');
+        }
+
+        $this->merge($data);
+    }
+
     public function rules(): array
     {
         return [

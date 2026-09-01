@@ -2,6 +2,7 @@
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,6 +14,7 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -78,6 +80,32 @@ return Application::configure(basePath: dirname(__DIR__))
                     message: $message,
                     errors: $errors,
                     status: $error->status ?? 422
+                );
+            }
+        });
+
+        $exceptions->render(function (
+            ModelNotFoundException $error,
+            Request $request
+        ) {
+            if ($request->is('api/*')) {
+                return response()->error(
+                    message: 'The requested resource was not found.',
+                    errors: null,
+                    status: 404
+                );
+            }
+        });
+
+        $exceptions->render(function (
+            NotFoundHttpException $error,
+            Request $request
+        ) {
+            if ($request->is('api/*')) {
+                return response()->error(
+                    message: 'The requested endpoint or resource was not found.',
+                    errors: null,
+                    status: 404
                 );
             }
         });

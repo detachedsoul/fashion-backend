@@ -19,6 +19,7 @@ class FabricResource extends JsonResource
             'price_modifier_kobo' => $this->price_modifier_kobo,
             'swatch_image_path' => $this->swatch_image_path,
             'stock_status' => $this->stock_status,
+            'is_active' => $this->is_active,
         ];
     }
 }

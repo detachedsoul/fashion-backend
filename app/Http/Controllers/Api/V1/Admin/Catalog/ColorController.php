@@ -26,6 +26,10 @@ class ColorController extends Controller
                 $request->filled('search'),
                 fn ($query) => $query->where('name', 'like', '%'.$request->string('search')->value().'%'),
             )
+            ->when(
+                $request->filled('hex_code'),
+                fn ($query) => $query->where('hex_code', 'like', '%'.$request->string('hex_code')->value().'%'),
+            )
             ->orderBy('name')
             ->get();
 

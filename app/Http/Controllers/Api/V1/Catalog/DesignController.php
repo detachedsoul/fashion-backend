@@ -21,8 +21,12 @@ class DesignController extends Controller
                 fn ($query) => $query->where('clothing_type_id', $request->string('clothing_type_id')->value()),
             )
             ->when(
-                $request->filled('featured'),
-                fn ($query) => $query->where('is_featured', $request->boolean('featured')),
+                $request->filled('is_featured'),
+                fn ($query) => $query->where('is_featured', $request->boolean('is_featured')),
+            )
+            ->when(
+                $request->filled('is_active'),
+                fn ($query) => $query->where('is_active', $request->boolean('is_active')),
             )
             ->when(
                 $request->filled('search'),
