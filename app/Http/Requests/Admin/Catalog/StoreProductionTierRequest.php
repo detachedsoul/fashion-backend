@@ -11,10 +11,20 @@ class StoreProductionTierRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $data = [];
+
+        if ($this->has('is_active')) {
+            $data['is_active'] = $this->boolean('is_active');
+        }
+
+        $this->merge($data);
+    }
+
     public function rules(): array
     {
         return [
-            'key' => ['required', 'string', 'max:50', 'unique:production_tiers,key'],
             'name' => ['required', 'string', 'max:255'],
             'production_days_min' => ['required', 'integer', 'min:0'],
             'production_days_max' => ['required', 'integer', 'gte:production_days_min'],

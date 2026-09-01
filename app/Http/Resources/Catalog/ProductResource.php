@@ -25,6 +25,7 @@ class ProductResource extends JsonResource
             'base_price_kobo' => $this->base_price_kobo,
             'sku' => $this->sku,
             'stock_quantity' => $this->stock_quantity,
+            'is_active' => $this->is_active,
             'clothing_type' => new ClothingTypeResource($this->whenLoaded('clothingType')),
             'variants' => ProductVariantResource::collection($this->whenLoaded('variants')),
             'images' => ProductImageResource::collection($this->whenLoaded('images')),

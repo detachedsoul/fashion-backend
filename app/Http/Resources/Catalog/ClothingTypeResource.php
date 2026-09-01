@@ -17,6 +17,7 @@ class ClothingTypeResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'image_path' => $this->image_path,
+            'is_active' => $this->is_active,
             'is_custom_only' => $this->is_custom_only,
         ];
     }

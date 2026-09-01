@@ -24,6 +24,7 @@ class DesignResource extends JsonResource
             'description' => $this->description,
             'base_price_kobo' => $this->base_price_kobo,
             'is_featured' => $this->is_featured,
+            'is_active' => $this->is_active,
             'clothing_type' => new ClothingTypeResource($this->whenLoaded('clothingType')),
             'images' => DesignImageResource::collection($this->whenLoaded('images')),
         ];

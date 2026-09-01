@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin\Catalog;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateProductionTierRequest extends FormRequest
 {
@@ -12,12 +11,20 @@ class UpdateProductionTierRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $data = [];
+
+        if ($this->has('is_active')) {
+            $data['is_active'] = $this->boolean('is_active');
+        }
+
+        $this->merge($data);
+    }
+
     public function rules(): array
     {
-        $tierId = $this->route('production_tier')?->id;
-
         return [
-            'key' => ['sometimes', 'string', 'max:50', Rule::unique('production_tiers', 'key')->ignore($tierId)],
             'name' => ['sometimes', 'string', 'max:255'],
             'production_days_min' => ['sometimes', 'integer', 'min:0'],
             'production_days_max' => ['sometimes', 'integer', 'gte:production_days_min'],

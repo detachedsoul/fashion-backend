@@ -19,6 +19,7 @@ class ProductionTierResource extends JsonResource
             'production_days_max' => $this->production_days_max,
             'fee_type' => $this->fee_type,
             'fee_value' => $this->fee_value,
+            'is_active' => $this->is_active,
         ];
     }
 }

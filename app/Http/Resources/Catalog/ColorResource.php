@@ -16,6 +16,7 @@ class ColorResource extends JsonResource
             'name' => $this->name,
             'hex_code' => $this->hex_code,
             'swatch_image_path' => $this->swatch_image_path,
+            'is_active' => $this->is_active,
         ];
     }
 }
