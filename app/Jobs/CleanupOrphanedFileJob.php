@@ -25,14 +25,26 @@ class CleanupOrphanedFileJob implements ShouldQueue
                 ProductImage::where('path', $this->path)->exists();
 
             if ($referenced) {
-                Log::info('CleanupOrphanedFileJob: path still referenced, skipping delete', ['path' => $this->path]);
+                Log::info(
+                    'CleanupOrphanedFileJob: path still referenced, skipping delete',
+                    ['path' => $this->path]
+                );
+
                 return;
             }
 
             $images->delete($this->path);
-            Log::info('CleanupOrphanedFileJob: deleted orphaned file', ['path' => $this->path]);
+
+            Log::info(
+                'CleanupOrphanedFileJob: deleted orphaned file',
+                ['path' => $this->path]
+            );
         } catch (\Throwable $e) {
-            Log::error('CleanupOrphanedFileJob: failed to delete orphaned file', ['path' => $this->path, 'error' => $e->getMessage()]);
+            Log::error(
+                'CleanupOrphanedFileJob: failed to delete orphaned file',
+                ['path' => $this->path, 'error' => $e->getMessage()]
+            );
+
             throw $e;
         }
     }

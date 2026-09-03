@@ -38,7 +38,11 @@ class ProductImageController extends Controller
             try {
                 $newPath = $this->images->store($request->file('image'), 'products');
             } catch (\Throwable $e) {
-                Log::error('ProductImageController::update - upload failed', ['error' => $e->getMessage()]);
+                Log::error(
+                    'ProductImageController::update - upload failed',
+                    ['error' => $e->getMessage()]
+                );
+
                 return response()->error('Failed to upload file', 500);
             }
         }
@@ -49,19 +53,30 @@ class ProductImageController extends Controller
 
         if ($newPath) {
             DB::beginTransaction();
+
             try {
                 $image->path = $newPath;
                 $image->save();
                 DB::commit();
             } catch (\Throwable $e) {
                 DB::rollBack();
+
                 try {
                     $this->images->delete($newPath);
                 } catch (\Throwable $delEx) {
-                    Log::error('Failed to delete orphaned new image after DB rollback', ['newPath' => $newPath, 'error' => $delEx->getMessage()]);
+                    Log::error(
+                        'Failed to delete orphaned new image after DB rollback',
+                        ['newPath' => $newPath, 'error' => $delEx->getMessage()]
+                    );
+
                     CleanupOrphanedFileJob::dispatch($newPath)->delay(now()->addMinutes(1));
                 }
-                Log::error('ProductImageController::update - DB save failed', ['error' => $e->getMessage()]);
+
+                Log::error(
+                    'ProductImageController::update - DB save failed',
+                    ['error' => $e->getMessage()]
+                );
+
                 return response()->error('Failed to save image record', 500);
             }
 
@@ -69,7 +84,11 @@ class ProductImageController extends Controller
                 try {
                     $this->images->delete($oldPath);
                 } catch (\Throwable $delEx) {
-                    Log::warning('Failed to delete old product image after DB update', ['oldPath' => $oldPath, 'newPath' => $newPath, 'error' => $delEx->getMessage()]);
+                    Log::warning(
+                        'Failed to delete old product image after DB update',
+                        ['oldPath' => $oldPath, 'newPath' => $newPath, 'error' => $delEx->getMessage()]
+                    );
+
                     CleanupOrphanedFileJob::dispatch($oldPath);
                 }
             }
@@ -78,6 +97,7 @@ class ProductImageController extends Controller
         }
 
         $image->refresh();
+
         return response()->success(data: new ProductImageResource($image), message: 'Image updated.');
     }
 
@@ -88,7 +108,11 @@ class ProductImageController extends Controller
         try {
             $this->images->delete($path);
         } catch (\Throwable $e) {
-            Log::warning('Failed to delete product image in destroy; scheduling cleanup', ['path' => $path, 'error' => $e->getMessage()]);
+            Log::warning(
+                'Failed to delete product image in destroy; scheduling cleanup',
+                ['path' => $path, 'error' => $e->getMessage()]
+            );
+
             CleanupOrphanedFileJob::dispatch($path)->delay(now()->addMinutes(1));
         }
 
