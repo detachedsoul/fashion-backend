@@ -109,11 +109,11 @@ class ProductImageController extends Controller
         );
     }
 
-    public function destroy(Product $product, ProductImage $productImage): JsonResponse
+    public function destroy(Product $product, ProductImage $image): JsonResponse
     {
-        abort_unless($productImage->product_id === $product->id, 404);
-
-        $path = $productImage->path;
+        // With route scopeBindings the $image is already scoped to the $product,
+        // so there's no need to manually verify ownership here.
+        $path = $image->path;
 
         try {
             $this->images->delete($path);
@@ -122,7 +122,7 @@ class ProductImageController extends Controller
             CleanupOrphanedFileJob::dispatch($path)->delay(now()->addMinutes(1));
         }
 
-        $productImage->delete();
+        $image->delete();
 
         return response()->success(message: 'Image removed.');
     }
