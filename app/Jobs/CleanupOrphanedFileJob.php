@@ -21,7 +21,6 @@ class CleanupOrphanedFileJob implements ShouldQueue
     public function handle(CatalogImageService $images): void
     {
         try {
-            // Only delete if no DB record references this path
             $referenced = DesignImage::where('path', $this->path)->exists() ||
                 ProductImage::where('path', $this->path)->exists();
 
@@ -34,8 +33,6 @@ class CleanupOrphanedFileJob implements ShouldQueue
             Log::info('CleanupOrphanedFileJob: deleted orphaned file', ['path' => $this->path]);
         } catch (\Throwable $e) {
             Log::error('CleanupOrphanedFileJob: failed to delete orphaned file', ['path' => $this->path, 'error' => $e->getMessage()]);
-
-            // Re-throwing will let the job retry based on queue retry policy
             throw $e;
         }
     }
