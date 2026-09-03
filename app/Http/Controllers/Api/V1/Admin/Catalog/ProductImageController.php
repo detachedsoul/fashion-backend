@@ -50,7 +50,7 @@ class ProductImageController extends Controller
 
             $image->path = $this->images->store(
                 $request->file('image'),
-                'designs'
+                'products'
             );
         }
 
