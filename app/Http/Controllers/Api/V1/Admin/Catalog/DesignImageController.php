@@ -78,9 +78,9 @@ class DesignImageController extends Controller
     ): JsonResponse {
         $path = $image->path;
 
-        $image->delete();
-
+        // delete file first, then DB record to avoid orphan files on failure
         $this->images->delete($path);
+        $image->delete();
 
         return response()->success(
             message: 'Image removed.'
