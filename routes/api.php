@@ -7,8 +7,13 @@ use App\Http\Controllers\Api\V1\Admin\AdminPasswordResetController;
 use App\Http\Controllers\Api\V1\Admin\AdminProfileController;
 use App\Http\Controllers\Api\V1\Admin\Catalog\ClothingTypeController as AdminClothingTypeController;
 use App\Http\Controllers\Api\V1\Admin\Catalog\ColorController as AdminColorController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\DesignController as AdminDesignController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\DesignImageController;
 use App\Http\Controllers\Api\V1\Admin\Catalog\FabricController as AdminFabricController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\ProductController as AdminProductController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\ProductImageController;
 use App\Http\Controllers\Api\V1\Admin\Catalog\ProductionTierController as AdminProductionTierController;
+use App\Http\Controllers\Api\V1\Admin\Catalog\ProductVariantController;
 use App\Http\Controllers\Api\V1\Admin\Catalog\SizeController as AdminSizeController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
@@ -103,11 +108,36 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         ->name('admin.catalog.')
         ->middleware(['auth:admin', 'permission:products.manage'])
         ->group(function () {
-            Route::apiResource('clothing-types', AdminClothingTypeController::class)->except('show');
-            Route::apiResource('fabrics', AdminFabricController::class)->except('show');
-            Route::apiResource('colors', AdminColorController::class)->except('show');
-            Route::apiResource('sizes', AdminSizeController::class)->except('show');
-            Route::apiResource('production-tiers', AdminProductionTierController::class)->except('show');
+            Route::apiResource('clothing-types', AdminClothingTypeController::class)
+                ->except('show');
+            Route::apiResource('fabrics', AdminFabricController::class)
+                ->except('show');
+            Route::apiResource('colors', AdminColorController::class)
+                ->except('show');
+            Route::apiResource('sizes', AdminSizeController::class)
+                ->except('show');
+            Route::apiResource('production-tiers', AdminProductionTierController::class)
+                ->except('show');
+
+            // Designs
+            Route::apiResource('designs', AdminDesignController::class)
+                ->except('show');
+
+            // Products
+            Route::apiResource('products', AdminProductController::class)
+                ->except('show');
+
+            // Scoped design/product images, product variants
+            Route::scopeBindings()->group(function () {
+                Route::apiResource('designs.images', DesignImageController::class)
+                    ->only(['store', 'update', 'destroy']);
+
+                Route::apiResource('products.images', ProductImageController::class)
+                    ->only(['store', 'update', 'destroy']);
+
+                Route::apiResource('products.variants', ProductVariantController::class)
+                    ->only(['store', 'update', 'destroy']);
+            });
         });
 
     // User auth endpoints

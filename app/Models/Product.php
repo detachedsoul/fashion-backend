@@ -9,7 +9,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'slug', 'clothing_type_id', 'description', 'base_price_kobo', 'sku', 'stock_quantity', 'is_active', 'published_at'])]
+#[Fillable([
+    'name',
+    'slug',
+    'clothing_type_id',
+    'description',
+    'base_price_kobo',
+    'sku',
+    'stock_quantity',
+    'is_active',
+    'published_at',
+])]
 class Product extends Model
 {
     use HasUlids;
@@ -34,7 +44,9 @@ class Product extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+        return $this->hasMany(ProductImage::class)
+            ->orderBy('sort_order')
+            ->orderBy('id');
     }
 
     /**

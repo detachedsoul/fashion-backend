@@ -8,7 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['clothing_type_id', 'name', 'slug', 'description', 'base_price_kobo', 'is_featured', 'is_active'])]
+#[Fillable([
+    'clothing_type_id',
+    'name',
+    'slug',
+    'description',
+    'base_price_kobo',
+    'is_featured',
+    'is_active',
+])]
 class Design extends Model
 {
     use HasUlids;
@@ -28,6 +36,8 @@ class Design extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(DesignImage::class)->orderBy('sort_order');
+        return $this->hasMany(DesignImage::class)
+            ->orderBy('sort_order')
+            ->orderBy('id');
     }
 }

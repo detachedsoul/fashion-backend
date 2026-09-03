@@ -11,9 +11,13 @@ return new class extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('product_id')->constrained()->cascadeOnDelete();
-            $table->foreignUlid('fabric_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignUlid('color_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignUlid('size_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignUlid('fabric_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('color_id')->constrained()->cascadeOnDelete();
+            $table->foreignUlid('size_id')->constrained()->cascadeOnDelete();
+            $table->unique(
+                ['product_id', 'fabric_id', 'color_id', 'size_id'],
+                'product_variant_combination_unique'
+            );
             $table->string('sku')->unique();
             $table->unsignedInteger('price_override_kobo')->nullable();
             $table->unsignedInteger('stock_quantity')->default(0);
