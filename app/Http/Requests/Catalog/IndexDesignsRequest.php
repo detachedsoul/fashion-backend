@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Catalog;
 
+use App\Http\Requests\Concerns\ConvertsBooleans;
 use Illuminate\Foundation\Http\FormRequest;
 
 class IndexDesignsRequest extends FormRequest
 {
+    use ConvertsBooleans;
+
     public function authorize(): bool
     {
         return true; // public browsing endpoint
@@ -15,7 +18,7 @@ class IndexDesignsRequest extends FormRequest
     {
         return [
             'clothing_type_id' => ['sometimes', 'string', 'exists:clothing_types,id'],
-            'featured' => ['sometimes', 'boolean'],
+            'is_featured' => ['sometimes', 'boolean'],
             'search' => ['sometimes', 'string', 'max:255'],
             'min_price_kobo' => ['sometimes', 'integer', 'min:0'],
             'max_price_kobo' => ['sometimes', 'integer', 'gte:min_price_kobo'],

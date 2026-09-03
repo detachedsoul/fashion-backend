@@ -2,24 +2,16 @@
 
 namespace App\Http\Requests\Admin\Catalog;
 
+use App\Http\Requests\Concerns\ConvertsBooleans;
 use Illuminate\Foundation\Http\FormRequest;
 
 class IndexColorsRequest extends FormRequest
 {
+    use ConvertsBooleans;
+
     public function authorize(): bool
     {
         return true;
-    }
-
-    protected function prepareForValidation(): void
-    {
-        $data = [];
-
-        if ($this->has('is_active')) {
-            $data['is_active'] = $this->boolean('is_active');
-        }
-
-        $this->merge($data);
     }
 
     public function rules(): array

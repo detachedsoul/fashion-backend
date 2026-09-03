@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin\Catalog;
 use App\Http\Requests\Concerns\ConvertsBooleans;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreFabricRequest extends FormRequest
+class StoreDesignRequest extends FormRequest
 {
     use ConvertsBooleans;
 
@@ -17,12 +17,14 @@ class StoreFabricRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'clothing_type_id' => ['required', 'string', 'exists:clothing_types,id'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'price_modifier_kobo' => ['sometimes', 'integer', 'min:0'],
-            'stock_status' => ['required', 'in:in_stock,low_stock,out_of_stock'],
-            'image' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:4096', 'dimensions:min_width=100,min_height=100'],
+            'base_price_kobo' => ['required', 'integer', 'min:0'],
+            'is_featured' => ['sometimes', 'boolean'],
             'is_active' => ['sometimes', 'boolean'],
+            'images' => ['required', 'array', 'min:1'],
+            'images.*' => ['file', 'mimes:jpg,jpeg,png,webp', 'max:4096', 'dimensions:min_width=100,min_height=100'],
         ];
     }
 }

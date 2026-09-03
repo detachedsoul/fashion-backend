@@ -12,6 +12,7 @@ class DesignImageResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'path' => $this->path,
             'sort_order' => $this->sort_order,
         ];

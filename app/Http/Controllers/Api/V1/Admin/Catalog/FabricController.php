@@ -92,17 +92,25 @@ class FabricController extends Controller
     protected function uniqueSlug(string $name, ?string $ignoreId = null): string
     {
         $base = Str::slug($name);
-        $slug = $base;
-        $i = 1;
 
-        while (
-            Fabric::where('slug', $slug)
-                ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
-                ->exists()
-        ) {
-            $slug = "{$base}-".++$i;
+        if (! $this->slugExists($base, $ignoreId)) {
+            return $base;
         }
 
+        do {
+            $slug = "{$base}-".Str::lower(Str::random(6));
+        } while ($this->slugExists($slug, $ignoreId));
+
         return $slug;
+    }
+
+    protected function slugExists(string $slug, ?string $ignoreId = null): bool
+    {
+        return Fabric::where('slug', $slug)
+            ->when(
+                $ignoreId,
+                fn ($query) => $query->where('id', '!=', $ignoreId)
+            )
+            ->exists();
     }
 }

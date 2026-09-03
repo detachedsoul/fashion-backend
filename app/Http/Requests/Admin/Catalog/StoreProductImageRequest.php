@@ -2,13 +2,10 @@
 
 namespace App\Http\Requests\Admin\Catalog;
 
-use App\Http\Requests\Concerns\ConvertsBooleans;
 use Illuminate\Foundation\Http\FormRequest;
 
-class IndexProductionTiersRequest extends FormRequest
+class StoreProductImageRequest extends FormRequest
 {
-    use ConvertsBooleans;
-
     public function authorize(): bool
     {
         return true;
@@ -17,7 +14,8 @@ class IndexProductionTiersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'is_active' => ['sometimes', 'boolean'],
+            'image' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:4096', 'dimensions:min_width=100,min_height=100'],
+            'sort_order' => ['sometimes', 'integer', 'min:0'],
         ];
     }
 }

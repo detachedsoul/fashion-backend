@@ -5,7 +5,7 @@ namespace App\Http\Requests\Admin\Catalog;
 use App\Http\Requests\Concerns\ConvertsBooleans;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateFabricRequest extends FormRequest
+class UpdateProductRequest extends FormRequest
 {
     use ConvertsBooleans;
 
@@ -17,12 +17,13 @@ class UpdateFabricRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'clothing_type_id' => ['sometimes', 'string', 'exists:clothing_types,id'],
             'name' => ['sometimes', 'string', 'max:255'],
-            'description' => ['sometimes', 'string'],
-            'price_modifier_kobo' => ['sometimes', 'integer', 'min:0'],
-            'stock_status' => ['sometimes', 'in:in_stock,low_stock,out_of_stock'],
-            'image' => ['sometimes', 'file', 'mimes:jpg,jpeg,png,webp', 'max:4096', 'dimensions:min_width=100,min_height=100'],
+            'description' => ['sometimes', 'nullable', 'string'],
+            'base_price_kobo' => ['sometimes', 'integer', 'min:0'],
+            'stock_quantity' => ['sometimes', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
+            'published_at' => ['sometimes', 'nullable', 'date'],
         ];
     }
 }
