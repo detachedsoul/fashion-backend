@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Catalog\StoreProductImageRequest;
 use App\Http\Requests\Admin\Catalog\UpdateProductImageRequest;
 use App\Http\Resources\Catalog\ProductImageResource;
+use App\Jobs\CleanupOrphanedFileJob;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Services\CatalogImageService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductImageController extends Controller
 {
@@ -43,27 +46,63 @@ class ProductImageController extends Controller
         Product $product,
         ProductImage $image
     ): JsonResponse {
-        $oldPath = null;
+        $newPath = null;
+        $oldPath = $image->path;
 
         if ($request->hasFile('image')) {
-            $oldPath = $image->path;
-
-            $image->path = $this->images->store(
-                $request->file('image'),
-                'products'
-            );
+            try {
+                $newPath = $this->images->store($request->file('image'), 'products');
+            } catch (\Throwable $e) {
+                Log::error('ProductImageController::update - upload failed', ['error' => $e->getMessage()]);
+                return response()->error('Failed to upload file', 500);
+            }
         }
 
         if ($request->has('sort_order')) {
             $image->sort_order = $request->integer('sort_order');
         }
 
-        $image->save();
+        if ($newPath) {
+            DB::beginTransaction();
+            try {
+                $image->path = $newPath;
+                $image->save();
+                DB::commit();
+            } catch (\Throwable $e) {
+                DB::rollBack();
 
-        if ($oldPath) {
-            $this->images->delete($oldPath);
+                // Try to delete the newly uploaded file (compensating action)
+                try {
+                    $this->images->delete($newPath);
+                } catch (\Throwable $delEx) {
+                    Log::error('Failed to delete orphaned new image after DB rollback', [
+                        'newPath' => $newPath,
+                        'error' => $delEx->getMessage()
+                    ]);
+                    CleanupOrphanedFileJob::dispatch($newPath)->delay(now()->addMinutes(1));
+                }
+
+                Log::error('ProductImageController::update - DB save failed', ['error' => $e->getMessage()]);
+                return response()->error('Failed to save image record', 500);
+            }
+
+            // Post-commit: try to delete the old path; schedule cleanup if delete fails
+            if ($oldPath) {
+                try {
+                    $this->images->delete($oldPath);
+                } catch (\Throwable $delEx) {
+                    Log::warning('Failed to delete old product image after DB update', [
+                        'oldPath' => $oldPath, 'newPath' => $newPath, 'error' => $delEx->getMessage()
+                    ]);
+                    CleanupOrphanedFileJob::dispatch($oldPath);
+                }
+            }
+        } else {
+            // No new file, just a sort_order update
+            $image->save();
         }
 
+        $image->refresh();
         return response()->success(
             data: new ProductImageResource($image),
             message: 'Image updated.'
@@ -74,7 +113,15 @@ class ProductImageController extends Controller
     {
         abort_unless($productImage->product_id === $product->id, 404);
 
-        $this->images->delete($productImage->path);
+        $path = $productImage->path;
+
+        try {
+            $this->images->delete($path);
+        } catch (\Throwable $e) {
+            Log::warning('Failed to delete product image in destroy; scheduling cleanup', ['path' => $path, 'error' => $e->getMessage()]);
+            CleanupOrphanedFileJob::dispatch($path)->delay(now()->addMinutes(1));
+        }
+
         $productImage->delete();
 
         return response()->success(message: 'Image removed.');
